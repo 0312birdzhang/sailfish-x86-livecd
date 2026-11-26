@@ -1,8 +1,8 @@
-# Sailfish OS x86_64 Live
+# Sailfish OS x86 Live
 
 English | [简体中文](README.zh-CN.md)
 
-This live image runs the Sailfish OS 5.2.0.22 i486 userspace on Ubuntu Base 24.04.5 amd64 with the generic Ubuntu kernel. The root filesystem starts from the official Sailfish SDK 5.1.0.11 emulator image and is upgraded using the official 5.2.0.22 repositories. The lock screen and home screen default to landscape. Normal boot tries GPU rendering and falls back to software rendering if the GPU or buffer sharing checks fail. The basic graphics boot option always uses software rendering.
+This live image runs 32-bit Sailfish OS 5.2.0.22 (i486) in a container on 64-bit Ubuntu Base 24.04.5. The `amd64` suffix on the ISO and GitHub Actions artifact refers to the Ubuntu host. The Sailfish root filesystem starts from the official Sailfish SDK 5.1.0.11 emulator image and is upgraded using the official 5.2.0.22 repositories. The lock screen and home screen default to landscape. Normal boot tries GPU rendering and falls back to software rendering if the GPU or buffer sharing checks fail. The basic graphics boot option always uses software rendering.
 
 ## How it works
 

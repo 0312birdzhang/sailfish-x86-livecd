@@ -1,8 +1,8 @@
-# Sailfish OS x86_64 Live
+# Sailfish OS x86 Live
 
 [English](README.md) | 简体中文
 
-镜像使用 Ubuntu Base 24.04.5 amd64 和 Ubuntu 通用内核承载 Sailfish OS 5.2.0.22 i486 用户空间。基础 rootfs 来自官方 5.1.0.11 SDK 模拟器，并通过官方 5.2.0.22 软件源升级。锁屏与桌面默认横屏。常规启动尝试 GPU 渲染；显卡或缓冲共享检查失败时自动使用软件渲染，basic graphics 模式强制使用软件渲染。
+镜像以 64 位 Ubuntu Base 24.04.5 为宿主，在容器中运行 32 位 Sailfish OS 5.2.0.22（i486）。ISO 文件名和 GitHub Actions 产物名称中的 `amd64` 指的是 Ubuntu 宿主的架构。Sailfish 根文件系统来自官方 5.1.0.11 SDK 模拟器，并通过官方 5.2.0.22 软件源升级。锁屏与桌面默认横屏。常规启动尝试 GPU 渲染；显卡或缓冲共享检查失败时自动使用软件渲染，basic graphics 模式强制使用软件渲染。
 
 ## 构成
 

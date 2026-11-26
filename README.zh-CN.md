@@ -18,7 +18,19 @@
 - 容器有线接口在 ConnMan 启动前命名为 `wlan0`，通过有线 DHCP 获取地址，开发者设置读取该接口的实际 IPv4 地址。
 - systemd-networkd 管理独立网桥 `sfos0` 的自动地址池、DHCP 和 NAT，容器重连期间保留网关地址。
 
-## 制作
+## 使用 GitHub Actions 打包
+
+1. 在仓库中打开 [Actions → Build Sailfish LiveCD](https://github.com/0312birdzhang/sailfish-x86-livecd/actions/workflows/build-livecd.yml)。
+2. 点击 **Run workflow**，选择要打包的分支，然后确认运行。
+3. 构建成功后，打开对应的运行记录，在 **Artifacts** 中下载 **sailfish-live-amd64**。压缩包包含可启动的 ISO、16 GiB VMware 持久化磁盘、校验文件和构建清单，最长保留 7 天。
+
+解压后，在解压目录中校验 ISO 和持久化磁盘：
+
+```bash
+sha256sum -c SHA256SUMS sailfish-persistence-16G.vmdk.sha256
+```
+
+## 本地制作
 
 在本工作目录执行以下命令。
 

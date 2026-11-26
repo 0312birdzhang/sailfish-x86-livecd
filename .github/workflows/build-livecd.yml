@@ -1,0 +1,121 @@
+name: Build Sailfish LiveCD
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Check out the build scripts
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Prepare the Ubuntu runner
+        shell: bash
+        run: |
+          SFOS_WORK="$RUNNER_TEMP/sfos-live"
+          echo "SFOS_WORK=$SFOS_WORK" >> "$GITHUB_ENV"
+          mkdir -p "$SFOS_WORK"
+          available_bytes() {
+            df -B1 --output=avail "$1" | tail -n 1
+          }
+          minimum_bytes=$((20 * 1024 * 1024 * 1024))
+          # Both the extracted filesystems and the finished ISO need space.
+          if (( $(available_bytes "$SFOS_WORK") < minimum_bytes )); then
+            sudo rm -rf -- /usr/local/lib/android /usr/share/dotnet
+          fi
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            7zip e2fsprogs fdisk fuse2fs fuse3 gcc-multilib lxc-utils \
+            python3 qemu-utils rsync squashfs-tools uidmap
+          df -h "$SFOS_WORK" "$GITHUB_WORKSPACE"
+          if (( $(available_bytes "$SFOS_WORK") < minimum_bytes )); then
+            echo "::error::The build directory needs at least 20 GiB of free disk space."
+            exit 1
+          fi
+
+          # Ubuntu 24.04 restricts the unprivileged namespaces used by the builder.
+          if [[ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+          if [[ ! -c /dev/fuse ]]; then
+            sudo modprobe fuse
+          fi
+          test -c /dev/fuse
+
+          build_user=$(id -un)
+          for kind in uid gid; do
+            allocation="/etc/sub$kind"
+            if ! awk -F: -v user="$build_user" \
+              '$1 == user && $3 >= 65536 { found = 1 } END { exit !found }' "$allocation"; then
+              start=$(awk -F: 'BEGIN { end = 100000 } $2 + $3 > end { end = $2 + $3 } END { print end }' "$allocation")
+              sudo usermod "--add-sub${kind}s" "$start-$((start + 65535))" "$build_user"
+            fi
+          done
+
+          if ! command -v fusermount >/dev/null; then
+            mkdir -p "$RUNNER_TEMP/sfos-bin"
+            ln -s "$(command -v fusermount3)" "$RUNNER_TEMP/sfos-bin/fusermount"
+            echo "$RUNNER_TEMP/sfos-bin" >> "$GITHUB_PATH"
+          fi
+
+      - name: Check namespace and FUSE support
+        shell: bash
+        run: |
+          probe=$(mktemp -d "$SFOS_WORK/fuse-test.XXXXXX")
+          trap 'rm -- "$probe/probe.ext4"; rmdir -- "$probe/mounted" "$probe"' EXIT
+          mkdir "$probe/mounted"
+          truncate -s 16M "$probe/probe.ext4"
+          mkfs.ext4 -q -F "$probe/probe.ext4"
+          bash scripts/namespace.sh bash -euc '
+            fuse2fs -o ro,fakeroot "$1/probe.ext4" "$1/mounted"
+            mountpoint -q "$1/mounted"
+            test -d "$1/mounted/lost+found"
+            fusermount -u "$1/mounted"
+          ' _ "$probe"
+
+      - name: Build the Live ISO
+        shell: bash
+        run: ./build.sh
+
+      - name: Create the VMware persistence disk and verify checksums
+        shell: bash
+        working-directory: dist
+        run: |
+          python3 ../scripts/create-persistence-disk.py sailfish-persistence-16G.vmdk --size 16G
+          sha256sum sailfish-persistence-16G.vmdk > sailfish-persistence-16G.vmdk.sha256
+          sha256sum -c SHA256SUMS sailfish-persistence-16G.vmdk.sha256
+
+      - name: Upload the LiveCD package
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: sailfish-live-amd64
+          path: |
+            dist/sailfish-live-*-amd64.iso
+            dist/SHA256SUMS
+            dist/sailfish-persistence-16G.vmdk
+            dist/sailfish-persistence-16G.vmdk.sha256
+            dist/inputs.json
+            dist/ubuntu-packages.tsv
+            dist/sailfish-packages.tsv
+            dist/graphics-amd64.json
+            dist/graphics-i386.json
+            dist/graphics-sdk-packages.tsv
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+
+      - name: Upload build logs on failure
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: sailfish-live-build-logs
+          path: ${{ env.SFOS_WORK }}/logs/*.log
+          if-no-files-found: ignore
+          retention-days: 7

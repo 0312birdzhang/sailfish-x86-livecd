@@ -17,7 +17,19 @@ This live image runs the Sailfish OS 5.2.0.22 i486 userspace on Ubuntu Base 24.0
 - The container's Ethernet interface is named `wlan0` before ConnMan starts. It gets an address over wired DHCP, and the developer settings show its actual IPv4 address.
 - systemd-networkd manages the address pool, DHCP, and NAT for the dedicated `sfos0` bridge. The gateway address stays the same when the container reconnects.
 
-## Build the image
+## Build with GitHub Actions
+
+1. Open [Actions → Build Sailfish LiveCD](https://github.com/0312birdzhang/sailfish-x86-livecd/actions/workflows/build-livecd.yml) in this repository.
+2. Select **Run workflow**, choose the branch to build, and confirm.
+3. When the run succeeds, open it and download **sailfish-live-amd64** from **Artifacts**. The archive contains the bootable ISO, a 16 GiB VMware persistence disk, checksums, and build manifests. Artifacts are kept for up to 7 days.
+
+After extracting the archive, verify the ISO and persistence disk from the extracted directory:
+
+```bash
+sha256sum -c SHA256SUMS sailfish-persistence-16G.vmdk.sha256
+```
+
+## Build locally
 
 Run this from the repository root, using a work directory you can write to:
 

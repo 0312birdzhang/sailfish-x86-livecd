@@ -1,0 +1,12 @@
+[Unit]
+Description=Synchronize DNS for the Sailfish container
+Wants=systemd-resolved.service
+After=systemd-resolved.service
+
+[Service]
+Type=oneshot
+RuntimeDirectory=sailfish-dns
+RuntimeDirectoryMode=0755
+RuntimeDirectoryPreserve=yes
+ExecStart=/usr/bin/install -o root -g root -m 0644 /run/systemd/resolve/resolv.conf /run/sailfish-dns/resolv.conf.next
+ExecStart=/usr/bin/mv -f /run/sailfish-dns/resolv.conf.next /run/sailfish-dns/resolv.conf

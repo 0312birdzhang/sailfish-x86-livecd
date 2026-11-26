@@ -1,0 +1,8 @@
+[Unit]
+Description=Forward SSH connections to the Sailfish container
+Requires=sailfish-live.service
+After=sailfish-live.service
+PartOf=sailfish-live.service
+
+[Service]
+ExecStart=/usr/local/bin/sailfish-ssh-proxy

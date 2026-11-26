@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+
+if ip link show dev host0 >/dev/null 2>&1; then
+    ip link set dev host0 down
+    if ! ip link set dev host0 name wlan0; then
+        ip link set dev host0 up
+        exit 1
+    fi
+fi
+
+ip link set dev wlan0 up

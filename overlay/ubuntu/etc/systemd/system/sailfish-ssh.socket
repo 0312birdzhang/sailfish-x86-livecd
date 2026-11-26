@@ -1,0 +1,9 @@
+[Unit]
+Description=Sailfish SSH forwarding socket
+
+[Socket]
+ListenStream=2222
+NoDelay=true
+
+[Install]
+WantedBy=sockets.target

@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "boots": 2,
+  "filesystem": "ext4",
+  "label": "writable",
+  "host_files": true,
+  "sailfish_files": true,
+  "sailfish_user_ownership": true,
+  "ssh_setting": true,
+  "iso": "sailfish-live-5.2.0.22-amd64.iso",
+  "iso_sha256": "3fc8c440b0455bba188616fa0195ace59d4bc893de562821d26aae8a47e48495",
+  "clean_shutdowns": 2,
+  "logs": "/home/bird/data/tmp/sfos-live/build/persistence-ready-two-boots"
+}

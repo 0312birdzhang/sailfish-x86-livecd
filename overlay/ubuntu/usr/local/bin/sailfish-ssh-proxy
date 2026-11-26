@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+for attempt in $(seq 1 120); do
+    leader=$(machinectl show sailfish -p Leader --value 2>/dev/null || true)
+    if [[ "$leader" =~ ^[1-9][0-9]*$ ]]; then
+        address=$(nsenter -t "$leader" --net ip -4 -o addr show dev wlan0 scope global 2>/dev/null \
+            | awk '{split($4, address, "/"); print address[1]; exit}' || true)
+        if [[ -n "$address" ]]; then
+            exec /usr/lib/systemd/systemd-socket-proxyd "$address:22"
+        fi
+    fi
+    sleep 0.5
+done
+echo 'Sailfish SSH proxy: container IPv4 address is unavailable' >&2
+exit 1

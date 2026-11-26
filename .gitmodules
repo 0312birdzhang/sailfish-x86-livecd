@@ -1,0 +1,6 @@
+[submodule "mesa"]
+	path = mesa
+	url = https://github.com/sailfishos-mirror/mesa.git
+[submodule "wayland"]
+	path = wayland
+	url = https://github.com/sailfishos-mirror/wayland.git

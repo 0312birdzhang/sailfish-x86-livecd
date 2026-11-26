@@ -1,0 +1,43 @@
+{
+  "sailfish_release": "5.2.0.22",
+  "sailfish_seed_release": "5.1.0.11",
+  "ubuntu": {
+    "filename": "ubuntu-base-24.04.5-base-amd64.tar.gz",
+    "sha256": "e77b6f10c2590cef872b33ee9f635a0e3fd1f57fb074c0e52b5c7f56147a0c86",
+    "url": "https://cdimage.ubuntu.com/ubuntu-base/releases/24.04/release/ubuntu-base-24.04.5-base-amd64.tar.gz"
+  },
+  "sailfish": {
+    "filename": "Sailfish_OS-5.1.0.11-Sailfish_SDK_Emulator.7z",
+    "sha256": "a92e06d3bac500495e9c49b4ed77dd07a826793a8e460725022851e8f4479a94",
+    "url": "https://releases.sailfishos.org/sdk/emulators/Sailfish_OS-5.1.0.11-Sailfish_SDK_Emulator.7z"
+  },
+  "weston_compatibility": [
+    {
+      "filename": "weston_9.0.0-4ubuntu1_amd64.deb",
+      "sha256": "f6abfdd55c0bdb62097e14cea2d4834ba4546f28210a68aa31c8cd9bab4e6969",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/universe/w/weston/weston_9.0.0-4ubuntu1_amd64.deb"
+    },
+    {
+      "filename": "libweston-9-0_9.0.0-4ubuntu1_amd64.deb",
+      "sha256": "a54f399cb3b9f28314945875e40072eeb766a1fe0022659b66e88de43fa9c012",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/universe/w/weston/libweston-9-0_9.0.0-4ubuntu1_amd64.deb"
+    }
+  ],
+  "sailfish_package_manager": [
+    {
+      "filename": "sailfish-package-manager/5.2.0.22/augeas-libs-1.14.1+git1-1.7.3.jolla.i486.rpm",
+      "sha256": "7d41b31f50155665cd012b76217c8fb20b5bc17f29a0390f8e75d3206db3862f",
+      "url": "https://releases.jolla.com/releases/5.2.0.22/jolla/i486/oss/i486/augeas-libs-1.14.1+git1-1.7.3.jolla.i486.rpm"
+    },
+    {
+      "filename": "sailfish-package-manager/5.2.0.22/readline-8.3+git2-1.7.3.jolla.i486.rpm",
+      "sha256": "364d571d622f8e5a6b90d0c37bcb17416f43bad10c4fa9fccf6df3c6e1e4594b",
+      "url": "https://releases.jolla.com/releases/5.2.0.22/jolla/i486/oss/i486/readline-8.3+git2-1.7.3.jolla.i486.rpm"
+    },
+    {
+      "filename": "sailfish-package-manager/5.2.0.22/zypper-1.14.68+git1-1.7.4.jolla.i486.rpm",
+      "sha256": "e3d0f868e337b88a7b00736b2136c18c2c10937274105ce68cb3418215391570",
+      "url": "https://releases.jolla.com/releases/5.2.0.22/jolla/i486/oss/i486/zypper-1.14.68+git1-1.7.4.jolla.i486.rpm"
+    }
+  ]
+}

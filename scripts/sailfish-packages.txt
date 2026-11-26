@@ -1,0 +1,1 @@
+# Additional package installation is disabled for the SDK baseline image.

@@ -1,0 +1,33 @@
+{
+  "version": "25.2.8",
+  "source": {
+    "name": "mesa-25.2.8.tar.xz",
+    "url": "https://archive.mesa3d.org/mesa-25.2.8.tar.xz",
+    "sha256": "097842f3e49d996868b38688db87b006f7d4541e93ce86d2f341d8b3e7be7c93"
+  },
+  "wayland_protocols": {
+    "name": "wayland-protocols-1.41.tar.xz",
+    "url": "https://gitlab.freedesktop.org/wayland/wayland-protocols/-/releases/1.41/downloads/wayland-protocols-1.41.tar.xz",
+    "sha256": "2786b6b1b79965e313f2c289c12075b9ed700d41844810c51afda10ee329576b"
+  },
+  "python_requirements": ["meson==1.12.1", "ninja==1.13.2", "Mako==1.4.3", "packaging==26.3", "PyYAML==6.0.4", "MarkupSafe==3.0.4"],
+  "meson_options": [
+    "-Dplatforms=x11,wayland",
+    "-Dlegacy-wayland=bind-wayland-display",
+    "-Dgallium-drivers=iris,crocus,radeonsi,nouveau,virgl,svga,llvmpipe,softpipe",
+    "-Dvulkan-drivers=[]",
+    "-Dllvm=enabled",
+    "-Dshared-llvm=enabled",
+    "-Dglx=dri",
+    "-Dglvnd=enabled",
+    "-Dgbm=enabled",
+    "-Degl=enabled",
+    "-Dgles1=disabled",
+    "-Dgles2=enabled",
+    "-Dgallium-vdpau=disabled",
+    "-Dgallium-va=disabled",
+    "-Dgallium-rusticl=false",
+    "-Dvideo-codecs=[]",
+    "-Dbuild-tests=false"
+  ]
+}

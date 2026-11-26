@@ -1,0 +1,10 @@
+[Unit]
+Description=Watch upstream DNS changes for Sailfish
+Wants=systemd-resolved.service
+After=systemd-resolved.service
+
+[Path]
+PathChanged=/run/systemd/resolve/resolv.conf
+
+[Install]
+WantedBy=multi-user.target

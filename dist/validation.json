@@ -1,0 +1,195 @@
+{
+  "release": "5.2.0.22",
+  "gpu": {
+    "platform": "--wayland",
+    "wayland_globals": [
+      {
+        "name": "wl_compositor",
+        "version": 3
+      },
+      {
+        "name": "wl_subcompositor",
+        "version": 1
+      },
+      {
+        "name": "wl_data_device_manager",
+        "version": 1
+      },
+      {
+        "name": "wl_shm",
+        "version": 2
+      },
+      {
+        "name": "qt_hardware_integration",
+        "version": 1
+      },
+      {
+        "name": "wl_drm",
+        "version": 2
+      },
+      {
+        "name": "qt_surface_extension",
+        "version": 1
+      },
+      {
+        "name": "qt_touch_extension",
+        "version": 1
+      },
+      {
+        "name": "qt_windowmanager",
+        "version": 1
+      },
+      {
+        "name": "wl_seat",
+        "version": 3
+      },
+      {
+        "name": "wl_output",
+        "version": 2
+      },
+      {
+        "name": "wl_shell",
+        "version": 1
+      },
+      {
+        "name": "lipstick_recorder_manager",
+        "version": 1
+      },
+      {
+        "name": "wp_viewporter",
+        "version": 1
+      },
+      {
+        "name": "wp_fractional_scale_manager_v1",
+        "version": 1
+      },
+      {
+        "name": "alien_manager",
+        "version": 2
+      },
+      {
+        "name": "xdg_wm_base",
+        "version": 6
+      }
+    ],
+    "egl_version": "1.5",
+    "bind_wayland_display_extension": true,
+    "gl_renderer": "virgl",
+    "gl_version": "OpenGL ES 3.0 Mesa 25.2.8",
+    "graphics_libraries": [
+      "/usr/lib/sailfish-live/mesa/libgallium-25.2.8.so",
+      "/usr/lib/sailfish-live/mesa/libEGL_mesa.so.0.0.0",
+      "/usr/lib/sailfish-live/mesa/libGLdispatch.so.0",
+      "/usr/lib/sailfish-live/mesa/libgbm.so.1.0.0",
+      "/usr/lib/sailfish-live/mesa/libGLESv2.so.2",
+      "/usr/lib/sailfish-live/mesa/libEGL.so.1"
+    ]
+  },
+  "software": {
+    "platform": "--wayland",
+    "wayland_globals": [
+      {
+        "name": "wl_compositor",
+        "version": 3
+      },
+      {
+        "name": "wl_subcompositor",
+        "version": 1
+      },
+      {
+        "name": "wl_data_device_manager",
+        "version": 1
+      },
+      {
+        "name": "wl_shm",
+        "version": 2
+      },
+      {
+        "name": "qt_hardware_integration",
+        "version": 1
+      },
+      {
+        "name": "qt_surface_extension",
+        "version": 1
+      },
+      {
+        "name": "qt_touch_extension",
+        "version": 1
+      },
+      {
+        "name": "qt_windowmanager",
+        "version": 1
+      },
+      {
+        "name": "wl_seat",
+        "version": 3
+      },
+      {
+        "name": "wl_output",
+        "version": 2
+      },
+      {
+        "name": "wl_shell",
+        "version": 1
+      },
+      {
+        "name": "lipstick_recorder_manager",
+        "version": 1
+      },
+      {
+        "name": "wp_viewporter",
+        "version": 1
+      },
+      {
+        "name": "wp_fractional_scale_manager_v1",
+        "version": 1
+      },
+      {
+        "name": "alien_manager",
+        "version": 2
+      },
+      {
+        "name": "xdg_wm_base",
+        "version": 6
+      }
+    ],
+    "egl_version": "1.5",
+    "bind_wayland_display_extension": false,
+    "gl_renderer": "llvmpipe (LLVM 19.1.1, 128 bits)",
+    "gl_version": "OpenGL ES 3.2 Mesa 25.2.8",
+    "graphics_libraries": [
+      "/usr/lib/sailfish-live/mesa/libgallium-25.2.8.so",
+      "/usr/lib/sailfish-live/mesa/libEGL_mesa.so.0.0.0",
+      "/usr/lib/sailfish-live/mesa/libGLdispatch.so.0",
+      "/usr/lib/sailfish-live/mesa/libgbm.so.1.0.0",
+      "/usr/lib/sailfish-live/mesa/libGLESv2.so.2",
+      "/usr/lib/sailfish-live/mesa/libEGL.so.1"
+    ]
+  },
+  "software_vm": {
+    "graphics": "software",
+    "passed": true
+  },
+  "ssh_vm": {
+    "graphics": "gpu",
+    "passed": true
+  },
+  "normal_settings_native_libraries_and_drm": true,
+  "sandboxed_calculator_native_libraries_and_drm": true,
+  "developer_ssh_enable_password_login_via_host_port_2222_disable": true,
+  "vmware_fps_user_report": 50,
+  "persistence": {
+    "passed": true,
+    "boots": 2,
+    "filesystem": "ext4",
+    "label": "writable",
+    "host_files": true,
+    "sailfish_files": true,
+    "sailfish_user_ownership": true,
+    "ssh_setting": true,
+    "iso": "sailfish-live-5.2.0.22-amd64.iso",
+    "iso_sha256": "3fc8c440b0455bba188616fa0195ace59d4bc893de562821d26aae8a47e48495",
+    "clean_shutdowns": 2,
+    "logs": "/home/bird/data/tmp/sfos-live/build/persistence-ready-two-boots"
+  }
+}

@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ " $(cat /proc/cmdline) " == *" persistent "* ]]; then
+    persistence_filesystem=$(cat /run/sailfish-persistence/filesystem 2>/dev/null || true)
+    persistence_mode=$(cat /run/sailfish-persistence/mode 2>/dev/null || true)
+    if [[ "$persistence_mode" == persistent ]]; then
+        echo "Sailfish persistence: active ($persistence_filesystem backing filesystem)"
+    else
+        echo 'Sailfish persistence: no writable volume found; changes are temporary' >&2
+    fi
+fi
+
+export XDG_RUNTIME_DIR=/run/sfos-host
+install -d -m 0700 "$XDG_RUNTIME_DIR"
+rm -f "$XDG_RUNTIME_DIR/wayland-0" "$XDG_RUNTIME_DIR/wayland-0.lock"
+xset s off -dpms
+read -r screen_width screen_height < <(xrandr --current | awk '/^Screen 0:/ {gsub(",", "", $10); print $8, $10}')
+
+graphics_directory=/run/sailfish-graphics
+install -d -m 0755 "$graphics_directory"
+graphics_mode=software
+graphics_reason="no usable GPU render node"
+force_software=0
+for argument in $(cat /proc/cmdline); do
+    case "$argument" in
+        nomodeset|sfos.graphics=software) force_software=1 ;;
+    esac
+done
+export __EGL_VENDOR_LIBRARY_FILENAMES=/opt/sailfish-graphics/share/glvnd/egl_vendor.d/50_mesa.json
+if (( ! force_software )); then
+    for render_node in /dev/dri/renderD*; do
+        [[ -r "$render_node" && -w "$render_node" ]] || continue
+        if timeout 30 /usr/local/bin/sailfish-graphics-probe --gbm "$render_node" \
+            > "$graphics_directory/host-gbm.json" 2> "$graphics_directory/host-gbm.log" \
+            && grep -q '"bind_wayland_display_test":true' "$graphics_directory/host-gbm.json" \
+            && ! grep -Eqi 'llvmpipe|softpipe|Software Rasterizer' "$graphics_directory/host-gbm.json"; then
+            graphics_mode=gpu
+            graphics_reason="$render_node supports GPU buffers"
+            break
+        fi
+    done
+else
+    graphics_reason="software graphics requested by boot option"
+fi
+
+weston_pid=
+trap 'if [[ -n "$weston_pid" ]]; then kill "$weston_pid" 2>/dev/null || true; fi' EXIT
+start_weston() {
+    local renderer_arguments=()
+    if [[ "$graphics_mode" == software ]]; then renderer_arguments+=(--use-pixman); fi
+    rm -f "$XDG_RUNTIME_DIR/wayland-0" "$XDG_RUNTIME_DIR/wayland-0.lock"
+    LD_LIBRARY_PATH=/opt/sailfish-graphics/lib:/opt/weston9/usr/lib/x86_64-linux-gnu:/opt/weston9/usr/lib/x86_64-linux-gnu/weston \
+        /opt/weston9/usr/bin/weston --backend=x11-backend.so \
+        "${renderer_arguments[@]}" --shell=/opt/weston9/usr/lib/x86_64-linux-gnu/weston/kiosk-shell.so \
+        --width="$screen_width" --height="$screen_height" \
+        --socket=wayland-0 --idle-time=0 --no-config \
+        --log=/var/log/sailfish-weston.log &
+    weston_pid=$!
+    for attempt in $(seq 1 1200); do
+        if [[ -S "$XDG_RUNTIME_DIR/wayland-0" ]]; then return 0; fi
+        kill -0 "$weston_pid" 2>/dev/null || return 1
+        sleep 0.1
+    done
+    return 1
+}
+
+if [[ "$graphics_mode" == gpu ]]; then
+    if ! start_weston \
+        || ! WAYLAND_DISPLAY="$XDG_RUNTIME_DIR/wayland-0" timeout 30 /usr/local/bin/sailfish-graphics-probe --wayland \
+            > "$graphics_directory/host-wayland.json" 2> "$graphics_directory/host-wayland.log" \
+        || ! grep -q '"name":"wl_drm"' "$graphics_directory/host-wayland.json" \
+        || ! grep -q '"bind_wayland_display_extension":true' "$graphics_directory/host-wayland.json" \
+        || grep -Eqi 'llvmpipe|softpipe|Software Rasterizer' "$graphics_directory/host-wayland.json"; then
+        graphics_reason="Weston GPU buffer verification failed; using software graphics"
+        kill "$weston_pid" 2>/dev/null || true
+        wait "$weston_pid" 2>/dev/null || true
+        graphics_mode=software
+        start_weston
+    fi
+else
+    start_weston
+fi
+printf '%s\n' "$graphics_mode" > "$graphics_directory/mode"
+printf '%s\n' "$graphics_reason" > "$graphics_directory/reason"
+printf 'Sailfish graphics: %s (%s)\n' "$graphics_mode" "$graphics_reason"
+if [[ "$graphics_mode" == gpu ]]; then
+    printf 'LIBGL_ALWAYS_SOFTWARE=0\nGALLIUM_DRIVER=\n' > "$graphics_directory/95-live-graphics.conf"
+else
+    printf 'LIBGL_ALWAYS_SOFTWARE=1\nGALLIUM_DRIVER=llvmpipe\n' > "$graphics_directory/95-live-graphics.conf"
+fi
+chmod 0644 "$graphics_directory/95-live-graphics.conf"
+chmod 0666 "$XDG_RUNTIME_DIR/wayland-0"
+unset __EGL_VENDOR_LIBRARY_FILENAMES
+
+export SYSTEMD_NSPAWN_UNIFIED_HIERARCHY=0
+nspawn_arguments=(
+    --directory=/opt/sailfish/rootfs --machine=sailfish
+    --boot --network-bridge=sfos0 --console=pipe --settings=no --resolv-conf=off
+    --capability=CAP_SYS_TIME
+    --bind-ro="$XDG_RUNTIME_DIR/wayland-0:/run/sfos-host/wayland-0"
+    --bind-ro=/run/udev:/run/udev
+    --bind-ro=/run/sailfish-dns:/run/host-resolve
+    --bind-ro="$graphics_directory/95-live-graphics.conf:/var/lib/environment/compositor/95-live-graphics.conf"
+    --bind-ro="$graphics_directory/95-live-graphics.conf:/var/lib/environment/nemo/95-live-graphics.conf"
+)
+if [[ -d /dev/dri ]]; then
+    nspawn_arguments+=(--property="DeviceAllow=char-drm rw" --bind=/dev/dri)
+fi
+if [[ -d /dev/snd ]]; then
+    nspawn_arguments+=(--property="DeviceAllow=char-alsa rwm" --bind=/dev/snd)
+fi
+if [[ -d /dev/input ]]; then
+    nspawn_arguments+=(--property="DeviceAllow=char-input rwm" --bind-ro=/dev/input)
+fi
+systemd-nspawn "${nspawn_arguments[@]}"

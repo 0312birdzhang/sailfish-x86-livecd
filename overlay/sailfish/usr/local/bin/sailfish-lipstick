@@ -1,0 +1,4 @@
+#!/bin/sh
+# Restore the preload after sg has selected Lipstick's existing privileged group.
+export LD_PRELOAD=/usr/lib/sailfish-live/libwayland-parent.so
+exec /usr/bin/lipstick --systemd

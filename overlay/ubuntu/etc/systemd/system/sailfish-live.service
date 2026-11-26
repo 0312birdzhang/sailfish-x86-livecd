@@ -1,0 +1,25 @@
+[Unit]
+Description=Sailfish OS live session
+After=systemd-user-sessions.service systemd-networkd.service systemd-resolved.service sailfish-dns.service
+Wants=systemd-networkd.service systemd-resolved.service sailfish-dns.path
+Requires=sailfish-dns.service
+Conflicts=getty@tty7.service
+
+[Service]
+Type=simple
+Environment=HOME=/root
+ExecStart=/usr/bin/xinit /usr/local/bin/sailfish-session -- /usr/bin/Xorg :0 vt7 -nolisten tcp -keeptty
+ExecStop=-/usr/bin/machinectl terminate sailfish
+Restart=always
+RestartSec=5
+StandardInput=tty
+StandardOutput=journal
+StandardError=journal
+TTYPath=/dev/tty7
+TTYReset=yes
+TTYVHangup=yes
+KillMode=control-group
+TimeoutStopSec=90
+
+[Install]
+WantedBy=graphical.target

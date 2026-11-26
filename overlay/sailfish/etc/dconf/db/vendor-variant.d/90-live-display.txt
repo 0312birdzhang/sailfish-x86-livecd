@@ -1,0 +1,5 @@
+[lipstick]
+orientationLock='landscape'
+
+[desktop/lipstick-jolla-home]
+allow_homescreen_rotation=true

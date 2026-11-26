@@ -48,7 +48,9 @@ gcc -m32 -shared -fPIC -nostdlib -Wall -Wextra -Werror \
     "$source_directory/src/wayland-parent.c" \
     -o "$sailfish_root/usr/lib/sailfish-live/libwayland-parent.so"
 rm -f "$ubuntu_root/etc/systemd/network/80-container-ve.network.d/live.conf"
-rsync -a "$source_directory/overlay/ubuntu/" "$ubuntu_root/"
+# Let dpkg install its casper conffile before applying the LiveCD version.
+rsync -a --exclude=/etc/casper.conf "$source_directory/overlay/ubuntu/" "$ubuntu_root/"
+cp "$source_directory/overlay/ubuntu/etc/casper.conf" "$ubuntu_root/tmp/casper-live.conf"
 rm -f "$ubuntu_root/etc/resolv.conf"
 cp /etc/resolv.conf "$ubuntu_root/etc/resolv.conf"
 printf '#!/bin/sh\nexit 101\n' > "$ubuntu_root/usr/sbin/policy-rc.d"
@@ -56,7 +58,7 @@ chmod 0755 "$ubuntu_root/usr/sbin/policy-rc.d"
 cp "$source_directory/scripts/configure-ubuntu.sh" "$ubuntu_root/tmp/configure-live.sh"
 unshare --mount bash "$source_directory/scripts/in-namespace.sh" "$ubuntu_root" \
     /bin/bash /tmp/configure-live.sh
-rm -f "$ubuntu_root/tmp/configure-live.sh"
+rm -f "$ubuntu_root/tmp/configure-live.sh" "$ubuntu_root/tmp/casper-live.conf"
 mkdir -p "$ubuntu_root/opt/weston9"
 dpkg-deb -x "$work_directory/downloads/weston_9.0.0-4ubuntu1_amd64.deb" "$ubuntu_root/opt/weston9"
 dpkg-deb -x "$work_directory/downloads/libweston-9-0_9.0.0-4ubuntu1_amd64.deb" "$ubuntu_root/opt/weston9"

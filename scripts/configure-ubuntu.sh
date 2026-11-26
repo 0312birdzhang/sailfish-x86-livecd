@@ -13,6 +13,8 @@ apt-get install -y --no-install-recommends \
     squashfs-tools xorriso grub-pc-bin grub-efi-amd64-bin \
     mtools dosfstools curl ca-certificates weston zstd
 
+install -m 0644 /tmp/casper-live.conf /etc/casper.conf
+
 systemctl enable sailfish-live.service NetworkManager.service systemd-networkd.service \
     systemd-resolved.service sailfish-dns.path sailfish-ssh.socket
 systemctl set-default graphical.target
